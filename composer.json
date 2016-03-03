@@ -1,0 +1,20 @@
+{
+    "name": "adilab/quick-pdo",
+    "description": "Adi PDO handler",
+    "homepage": "https://github.com/adilab/quick-pdo.git",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Adrian Zurkiewicz",
+            "email": "adrian@adilab.net"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/adilab/quick-pdo/issues"
+    },
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
