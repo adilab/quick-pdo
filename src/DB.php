@@ -283,11 +283,102 @@ class DB {
 	}
 	
 	
+	/**
+	 * Inserts a new record into table
+	 * 
+	 * @param string $table Table name
+	 * @param array $data New record as associative table
+	 */
+	public function insert($table, $data) {
+
+		$fields = array();
+		$values = array();
+		$params = array();
+
+		foreach ($data as $field => $value) {
+
+			$fields[] = $field; // @TODO Add escape to field name
+			$values[] = '?';
+			$params[] = $value;
+		}
+
+		$fields = implode(',', $fields);
+		$values = implode(',', $values);
+
+		$sql = "INSERT INTO {$table} ( {$fields} ) VALUES ( {$values} ) "; // @TODO Add escape to table name
+
+		$this->execute($sql, $params);
+	}
+
+	/**
+	 * Update a record in table
+	 * 
+	 * @param string $table Table name
+	 * @param array $data New record as associative table
+	 * @param mixed $where Where expression as string, associative array, or instance of Where
+	 */
+	public function update($table, $data, $where) {
+
+		if (!$where instanceof Where) {
+
+			$where = new Where($where);
+		}
+
+		$where = $where->getWhere();
+
+		$fields = array();
+		$params = array();
+
+		foreach ($data as $field => $value) {
+
+			$fields[] = "{$field} = ?"; // @TODO Add escape to field name
+			$params[] = $value;
+		}
+
+		$fields = implode(',', $fields);
+
+		$sql = "UPDATE {$table} SET {$fields} WHERE {$where['sql']} "; // @TODO Add escape to table name
+
+		if (is_array($where['params'])) {
+
+			foreach ($where['params'] as $param) {
+
+				$params[] = $param;
+			}
+		}
+
+
+		$this->execute($sql, $params);
+//		echo $sql;
+//		print_r($params);
+	}
+
+	/**
+	 * Update all records in table
+	 * 
+	 * @param string $table Table name
+	 * @param array $data New record as associative table
+	 */
+	public function updateAll($table, $data) {
+
+		$fields = array();
+		$params = array();
+
+		foreach ($data as $field => $value) {
+
+			$fields[] = "{$field} = ?"; // @TODO Add escape to field name
+			$params[] = $value;
+		}
+
+		$fields = implode(',', $fields);
+
+		$sql = "UPDATE {$table} SET {$fields} "; // @TODO Add escape to table name
+
+		$this->execute($sql, $params);
+//		echo $sql;
+	}
 
 }
-
-
-
 
 /**
  * Auto initiation

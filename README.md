@@ -62,6 +62,12 @@ if (DB::alias('db1')->value("SELECT count(*) > 1 FROM my_table")) {
 	echo 'There are many records.';
 }
 
+// Usage insert() method
+DB::main()->insert('my_table', array('my_column1' => 'a', 'my_column2' => 'b'));
+
+// Usage update() method
+DB::main()->update('my_table', array('my_column1' => 'a', 'my_column2' => 'b'), new Where('id > ? AND id < ? OR id = ?', array(10,20,30)));
+DB::main()->update('my_table', array('my_column1' => 'a', 'my_column2' => 'b'), array('id' => 25));
 
 ```
 
