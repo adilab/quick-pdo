@@ -337,6 +337,7 @@ class DB {
 	 * 
 	 * @param string $table Table name
 	 * @param array $data New record as associative table
+	 * @return miexd Id of inserted record. (only for mysql !!!)
 	 */
 	public function insert($table, $data) {
 
@@ -359,6 +360,11 @@ class DB {
 		$sql = "INSERT INTO {$table} ( {$fields} ) VALUES ( {$values} ) ";
 
 		$this->execute($sql, $params);
+		
+		if ($this->engine->getType() == 'mysql') {
+			
+			return $this->getConnection()->lastInsertId();
+		}
 //		echo $sql;
 	}
 
