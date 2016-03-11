@@ -32,7 +32,7 @@ return array(
 	),
 	'my-db2' => array(
 
-		'dsn' => 'mysql:host=127.0.0.1;dbname=;charset=utf8',
+		'dsn' => 'pgsql:host=127.0.0.1;dbname=',
 		'user' => '',
 		'pass' => '',
 

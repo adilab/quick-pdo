@@ -23,32 +23,32 @@ namespace Adi\QuickPDO;
  * @author adrian
  */
 class Engine {
-	
+
 	/**
 	 *
 	 * @var string;
 	 */
 	private $type;
-	
+
 	/**
 	 *
 	 * @var DB
 	 */
 	private $db;
-	
+
 	/**
 	 * 
 	 * @param \Adi\QuickPDO\DB $db
 	 */
 	function __construct(DB $db) {
 		$this->db = $db;
-		
+
 		$config = $db->getConfig();
-		$dsn = $config['dsn'];
-		$type = explode(':', $dsn);
-		$type = @$type[0];
-		$this->type = $type;
-		
+
+		if (!$this->type = @$config['detail']['type']) {
+
+			throw new Exception("Incorrect dsn string. No database type.");
+		}
 	}
 
 	/**
@@ -60,19 +60,23 @@ class Engine {
 		return $this->type;
 	}
 
-	
-
-	
-	
+	/**
+	 * Escapes name of element
+	 * 
+	 * @param string $name
+	 */
 	public function escapeElement(& $name) {
-	
-		if ($this->type = 'mysql') {
-			
-			$name = "`{$name}`";
+
+		switch ($this->type) {
+
+			case 'mysql':
+				$name = "`{$name}`";
+				break;
+
+			case 'pgsql':
+				$name = "\"{$name}\"";
+				break;
 		}
-		
 	}
-	
-	
-	
+
 }

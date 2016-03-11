@@ -130,7 +130,7 @@ class DB {
 	 * 
 	 * @return array
 	 */
-	public function getAliases() {
+	static public function getAliases() {
 		
 		$result = array();
 		
@@ -172,15 +172,55 @@ class DB {
 	 * @var Engine
 	 */
 	private $engine;
+	
+	
+	/**
+	 *
+	 * @var Schema
+	 */
+	private $schema;
 
+
+	/**
+	 * 
+	 * @param string $dsn
+	 * @param string $user
+	 * @param string $pass
+	 */
 	function __construct($dsn, $user, $pass) {
+		
+		$type = explode(':', $dsn);
+		$detail = array(
+			
+			'type' => @$type[0],			
+		);
+		
+		if ($params = @$type[1]) {
+			
+			$params = explode(';', $params);
+			
+			foreach ($params as $value) {
+				
+				$value = explode('=', $value);
+				
+				if (@$value[0]) {
+					
+					$detail[$value[0]] = @$value[1];
+				}	
+			}
+		}
+		
+		
 		$this->config = array(
 			'dsn' => $dsn,
 			'user' => $user,
 			'pass' => $pass,
+			'detail' => $detail,
 		);
 		
 		$this->engine = new Engine($this);
+		$this->schema = new Schema($this);
+		
 	}
 
 	/**
@@ -193,6 +233,15 @@ class DB {
 		return $this->config;
 	} 
 	
+	/**
+	 * Returns database name
+	 * 
+	 * @return string
+	 */
+	public function getName() {
+		
+		return @$this->config['detail']['dbname'];
+	}
 	
 	
 	/**
@@ -232,7 +281,16 @@ class DB {
 		return $this->engine;
 	}
 
-	
+	/**
+	 * Returns instans of database schema 
+	 * 
+	 * @return Schema
+	 */
+	function getSchema() {
+		return $this->schema;
+	}
+
+		
 	
 	/**
 	 * Performs sql sequence
@@ -337,13 +395,15 @@ class DB {
 	 * 
 	 * @param string $table Table name
 	 * @param array $data New record as associative table
-	 * @return miexd Id of inserted record. (only for mysql !!!)
+	 * @return miexd Id of inserted record (not supported for composite primary key).
 	 */
 	public function insert($table, $data) {
 
 		$fields = array();
 		$values = array();
 		$params = array();
+		$table_name = $table;
+		$type = $this->engine->getType();
 
 		foreach ($data as $field => $value) {
 
@@ -358,13 +418,33 @@ class DB {
 
 		$this->engine->escapeElement($table);
 		$sql = "INSERT INTO {$table} ( {$fields} ) VALUES ( {$values} ) ";
-
-		$this->execute($sql, $params);
 		
-		if ($this->engine->getType() == 'mysql') {
+		
+		if ($type == 'pgsql') {
 			
+			$pk = $this->schema->getPK($table_name);
+			
+			if (count($pk) == 1) {
+				
+				$pk = $pk[0];
+				$sql .= " RETURNING {$pk}";
+				
+			}
+			
+			return $this->value($sql, $params);
+
+		}
+
+		
+		
+		if ($type == 'mysql') {
+			
+			$this->execute($sql, $params);
 			return $this->getConnection()->lastInsertId();
 		}
+		
+		$this->execute($sql, $params);
+		
 //		echo $sql;
 	}
 
