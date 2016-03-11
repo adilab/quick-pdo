@@ -36,12 +36,12 @@ class Where {
 	 */
 	private $params = NULL;
 
-	/**
-	 *
-	 * @var string
-	 */
-	private $sql;
 
+	/**
+	 * 
+	 * @param mixed $expression String or associative array
+	 * @param mixed $params Simple value or array of values
+	 */
 	function __construct($expression, $params = NULL) {
 
 		$this->expression = $expression;
@@ -57,13 +57,13 @@ class Where {
 			$this->params = $params;
 		}
 
-		$this->createSql();
+		
 	}
 
 	/**
-	 * 
+	 * @param \Adi\QuickPDO\DB $db
 	 */
-	private function createSql() {
+	private function createSql(DB $db) {
 
 		if (is_string($this->expression)) {
 
@@ -76,7 +76,8 @@ class Where {
 
 			foreach ($this->expression as $field => $value) {
 
-				$sql[] = "{$field} = ?"; // @TODO Add escape to field name
+				$db->getEngine()->escapeElement($field);
+				$sql[] = "{$field} = ?";
 				$this->params[] = $value;
 			}
 
@@ -88,13 +89,17 @@ class Where {
 		throw new Exception("'Where' expression cannot be created");
 	}
 
+
 	/**
 	 * Returns WHERE elements as associative array
 	 * 
+	 * @param \Adi\QuickPDO\DB $db
 	 * @return array
 	 */
-	public function getWhere() {
+	public function getWhere(DB $db) {
 
+		$this->createSql($db);
+		
 		return array(
 			'sql' => $this->sql,
 			'params' => $this->params,

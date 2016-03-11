@@ -58,7 +58,6 @@ class DB {
 			
 			if ((count(self::$alias)) or (!file_exists(QuickPDO_CONFIGURATION_FILE))) {
 				
-				echo '*';
 				return;
 				
 			}
@@ -125,6 +124,24 @@ class DB {
 		
 	}
 	
+	
+	/**
+	 * Returns aliases list
+	 * 
+	 * @return array
+	 */
+	public function getAliases() {
+		
+		$result = array();
+		
+		foreach (self::$alias as $key => $value) {
+		
+			$result[] = $key;
+		}
+		
+		return $result;
+	}
+	
 	/**
 	 * Returns main database instance
 	 * 
@@ -148,6 +165,13 @@ class DB {
 	 * @var PDO;
 	 */
 	private $pdo;
+	
+	
+	/**
+	 *
+	 * @var Engine
+	 */
+	private $engine;
 
 	function __construct($dsn, $user, $pass) {
 		$this->config = array(
@@ -155,8 +179,22 @@ class DB {
 			'user' => $user,
 			'pass' => $pass,
 		);
+		
+		$this->engine = new Engine($this);
 	}
 
+	/**
+	 * Returns main configuration
+	 * 
+	 * @return array
+	 */
+	public function getConfig() {
+		
+		return $this->config;
+	} 
+	
+	
+	
 	/**
 	 * Connect to DB
 	 * 
@@ -185,6 +223,16 @@ class DB {
 		
 		return $this->pdo;
 	}
+	
+	/**
+	 * 
+	 * @return Engine
+	 */
+	function getEngine() {
+		return $this->engine;
+	}
+
+	
 	
 	/**
 	 * Performs sql sequence
@@ -298,7 +346,8 @@ class DB {
 
 		foreach ($data as $field => $value) {
 
-			$fields[] = $field; // @TODO Add escape to field name
+			$this->engine->escapeElement($field);
+			$fields[] = $field;
 			$values[] = '?';
 			$params[] = $value;
 		}
@@ -306,9 +355,11 @@ class DB {
 		$fields = implode(',', $fields);
 		$values = implode(',', $values);
 
-		$sql = "INSERT INTO {$table} ( {$fields} ) VALUES ( {$values} ) "; // @TODO Add escape to table name
+		$this->engine->escapeElement($table);
+		$sql = "INSERT INTO {$table} ( {$fields} ) VALUES ( {$values} ) ";
 
 		$this->execute($sql, $params);
+//		echo $sql;
 	}
 
 	/**
@@ -325,20 +376,22 @@ class DB {
 			$where = new Where($where);
 		}
 
-		$where = $where->getWhere();
+		$where = $where->getWhere($this);
 
 		$fields = array();
 		$params = array();
 
 		foreach ($data as $field => $value) {
 
-			$fields[] = "{$field} = ?"; // @TODO Add escape to field name
+			$this->engine->escapeElement($field);
+			$fields[] = "{$field} = ?"; 
 			$params[] = $value;
 		}
 
 		$fields = implode(',', $fields);
 
-		$sql = "UPDATE {$table} SET {$fields} WHERE {$where['sql']} "; // @TODO Add escape to table name
+		$this->engine->escapeElement($table);
+		$sql = "UPDATE {$table} SET {$fields} WHERE {$where['sql']} "; 
 
 		if (is_array($where['params'])) {
 
@@ -367,13 +420,15 @@ class DB {
 
 		foreach ($data as $field => $value) {
 
-			$fields[] = "{$field} = ?"; // @TODO Add escape to field name
+			$this->engine->escapeElement($field);
+			$fields[] = "{$field} = ?"; 
 			$params[] = $value;
 		}
 
 		$fields = implode(',', $fields);
-
-		$sql = "UPDATE {$table} SET {$fields} "; // @TODO Add escape to table name
+		
+		$this->engine->escapeElement($table);
+		$sql = "UPDATE {$table} SET {$fields} "; 
 
 		$this->execute($sql, $params);
 //		echo $sql;
