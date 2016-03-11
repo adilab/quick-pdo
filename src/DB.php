@@ -22,7 +22,7 @@ use PDOStatement;
 
 
 if (!defined('QuickPDO_CONFIGURATION_FILE')) {
-    define('QuickPDO_CONFIGURATION_FILE', 'databases-configuration.php');
+    define('QuickPDO_CONFIGURATION_FILE', 'config/adi/databases.php');
 }
 
 /**
@@ -171,6 +171,7 @@ class DB {
 
 		$this->pdo = new PDO($this->config['dsn'], $this->config['user'], $this->config['pass']);
 		$this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+		$this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	}
 	
 	/**
