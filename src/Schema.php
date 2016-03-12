@@ -78,12 +78,42 @@ class Schema {
 	 * @return array
 	 * @throws Exception
 	 */
-	public function getTable() {
+	public function getTables() {
 
 		// @TODO add cache
-		// @TODO add body
+		
+		$result = array();
+		$type = $this->db->getType();
+		$database = $this->db->getName();
+		
+		switch ($type) {
 
-		throw new Exception("The method is not implemented yet.");
+			case "mysql" :
+
+				$sql = "SELECT TABLE_NAME AS `table` FROM information_schema.tables WHERE TABLE_SCHEMA = ? ORDER BY TABLE_NAME";
+				$data = $this->db->query($sql, $database)->fetchAll();
+				break;
+
+			case "pgsql" :
+
+				$sql = "SELECT c.relname AS \"table\" FROM pg_catalog.pg_class c
+						LEFT JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+						WHERE c.relkind IN ('r','') AND n.nspname NOT IN ('pg_catalog', 'pg_toast')
+						AND pg_catalog.pg_table_is_visible(c.oid)
+						ORDER BY c.relname";
+				$data = $this->db->query($sql)->fetchAll();
+				break;
+
+			default : throw new Exception("Database type '{$type}' is not yet supported.");
+		}		
+		
+		foreach ($data as $row) {
+			
+			$result[] = $row['table'];
+		}
+		
+		return $result;
+
 	}
 
 	/**
@@ -98,7 +128,7 @@ class Schema {
 		// @TODO add cache
 
 		$result = array();
-		$type = $this->db->getEngine()->getType();
+		$type = $this->db->getType();
 		$database = $this->db->getName();
 
 		switch ($type) {
