@@ -3,6 +3,13 @@ Adi PDO handler
 
 Allows to work with PDO faster and more convenient way.
 
+### Features
+- Aid for work with multi database,
+- Quick configuration,
+- Aid for work with SQL parameters,
+- Aid for INSERT and UPDATE statements,
+- Quick access to metadata from the schema.
+
 Installing
 ----------
 
