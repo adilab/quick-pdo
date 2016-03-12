@@ -331,15 +331,7 @@ class DB {
 	 */
 	public function & fetch($sql, $inputs_parameters = array()) {
 		
-		$result = array();
-		$query = $this->query($sql, $inputs_parameters);
-		
-		while ($row = $query->fetch()) {
-			
-			$result[] = $row;
-			
-		}
-		
+		$result = $this->query($sql, $inputs_parameters)->fetchAll();
 		return $result;
 		
 	}
