@@ -290,7 +290,14 @@ class DB {
 		return $this->schema;
 	}
 
-		
+	/**
+	 * Returns database type
+	 * 
+	 * @return string
+	 */
+	public function getType() {
+		return $this->engine->getType();
+	}
 	
 	/**
 	 * Performs sql sequence
