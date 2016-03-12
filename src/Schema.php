@@ -49,16 +49,27 @@ class Schema {
 
 		// @TODO add cache
 
-		$this->db->getEngine()->escapeElement($table);
+		$result = array();
 
-		$sql = "SELECT column_name, is_nullable = 'YES' AS is_nullable, data_type, character_maximum_length, column_default 
-				FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{$table}'
+		$sql = "SELECT column_name, is_nullable = 'YES' AS is_nullable, data_type, character_maximum_length, column_default, numeric_precision, numeric_scale 
+				FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = ?
 				ORDER BY ordinal_position";
 
 
-		// @TODO add body
+		foreach ($this->db->query($sql, $table)->fetchAll() as $row) {
 
-		throw new Exception("The method is not implemented yet.");
+			$result[$row['column_name']] = array(
+				'name' => $row['column_name'],
+				'type' => $row['data_type'],
+				'is_nullable' => (boolean) $row['is_nullable'],
+				'character_maximum_length' => $row['character_maximum_length'],
+				'numeric_precision' => $row['numeric_precision'],
+				'numeric_scale' => $row['numeric_scale'],
+				'default_value' => $row['column_default'],
+			);
+		}
+
+		return $result;
 	}
 
 	/**
