@@ -18,7 +18,7 @@ Configuration:
 -------------
 ```php
  /**
- * databases-configuration.php
+ * config/adi/databases.php
  */ 
 
 return array(

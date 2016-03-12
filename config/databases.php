@@ -18,7 +18,7 @@
 /**
  * WARNING!
  * 
- * Before you modify this file, move it to the directory: /config/adi/
+ * Before you modify this file, move it to the directory: config/adi/
  */
 
 return array(
