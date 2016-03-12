@@ -37,7 +37,7 @@ return array(
 	),
 	'db2' => array(
 
-		'dsn' => 'mysql:host=127.0.0.1;dbname=db2;charset=utf8',
+		'dsn' => 'pgsql:host=127.0.0.1;dbname=db2',
 		'user' => 'db2',
 		'pass' => '********',
 	),	
@@ -70,7 +70,8 @@ if (DB::alias('db1')->value("SELECT count(*) > 1 FROM my_table")) {
 }
 
 // Usage insert() method
-DB::main()->insert('my_table', array('my_column1' => 'a', 'my_column2' => 'b'));
+$id_key = DB::main()->insert('my_table', array('my_column1' => 'a', 'my_column2' => 'b'));
+echo $id_key;
 
 // Usage update() method
 DB::main()->update('my_table', array('my_column1' => 'a', 'my_column2' => 'b'), new Where('id > ? AND id < ? OR id = ?', array(10,20,30)));
