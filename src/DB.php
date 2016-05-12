@@ -327,11 +327,26 @@ class DB {
 	 * 
 	 * @param string $sql
 	 * @param mixed $inputs_parameters Simple input parameter or array of inputs
+	 * @param string $key Id field name in order to create associative array
 	 * @return array
 	 */
-	public function & fetch($sql, $inputs_parameters = array()) {
+	public function & fetch($sql, $inputs_parameters = array(), $key = NULL) {
 		
-		$result = $this->query($sql, $inputs_parameters)->fetchAll();
+		$result = array();
+		$query = $this->query($sql, $inputs_parameters);
+		
+		while ($row = $query->fetch()) {
+			
+			if ($key) {
+				
+				$result[$row[$key]] = $row;
+				
+			} else {
+			
+				$result[] = $row;
+			}
+		}
+		
 		return $result;
 		
 	}
@@ -488,7 +503,7 @@ class DB {
 
 
 		$this->execute($sql, $params);
-//		echo $sql;
+//		echo $sql . "\n";
 //		print_r($params);
 	}
 
